@@ -9,8 +9,17 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+# Team Members 
+Jillian Egland 
+https://github.com/jcegland/Homework-7 
+
+
+
 ## Reading in the data 
 ```{r} 
+library(tidyverse) 
+library(dplyr)
+library(ggplot2)
 data(happy, package="productplots")
 head(happy)
 
@@ -18,12 +27,189 @@ head(happy)
 
 
 
-
+# Updating Dataset 
 
 ```{r} 
+HAPPY <- readRDS("HAPPY.rds")
+happy1 = HAPPY 
+head(happy1)
+View(happy1)
+
+
+```
+
+# Cleaning "HAPPY" 
+
+plot shows that most people are in the "PRETTY HAPPY" category, then "VERY HAPPY", then "NOT SO HAPPY". There were a decent amount of NA's 
+```{r} 
+happy1 = happy1 %>% mutate(HAPPY = replace(HAPPY, HAPPY == "IAP", NA))
+happy1 = happy1 %>% mutate(HAPPY = replace(HAPPY, HAPPY == "DK", NA))
+
+happy1$HAPPY = as.factor(happy1$HAPPY)
+
+#happy2 = dplyr::filter(happy1, !(HAPPY %in% c("NOT TOO HAPPY", "PRETTY HAPPY", "VERY HAPPY", NA)) )
+
+happy1$HAPPY = factor(happy1$HAPPY, levels=c("NOT TOO HAPPY", "PRETTY HAPPY", "VERY HAPPY"))
+head(happy1)
+
+ggplot(happy1, aes(x=HAPPY)) + geom_bar()
+```
+
+
+# Cleaning "YEAR" 
+
+```{r} 
+happy1 = happy1 %>% mutate(YEAR = replace(YEAR, YEAR == "IAP", NA))
+happy1 = happy1 %>% mutate(YEAR = replace(YEAR, YEAR == "DK", NA))
+
+# variable type is fine as int 
+
+```
+
+
+# Cleaning "AGE" 
+
+the age count peaks at 25-40ish. Then the number of people in each age group slowly decreases as the age increases  
+unimodal, right skewed 
+
+```{r} 
+happy1 = happy1 %>% mutate(AGE = replace(AGE, AGE == "IAP", NA))
+happy1 = happy1 %>% mutate(AGE = replace(AGE, AGE == "DK", NA))
+
+happy1 = happy1 %>% mutate(AGE = replace(AGE, AGE == "89 OR OLDER", 89))
+happy1$AGE = as.numeric(happy1$AGE) 
+head(happy1)
+
+ggplot(happy1, aes(x=AGE)) + geom_histogram(binwidth=1)
+
+```
+
+
+# Cleaning "SEX" 
+
+more females than males in dataset 
+
+```{r} 
+happy1 = happy1 %>% mutate(SEX = replace(SEX, SEX == "IAP", NA))
+happy1 = happy1 %>% mutate(SEX = replace(SEX, SEX == "DK", NA))
+
+happy1$SEX = factor(happy1$SEX)
+
+ggplot(happy1, aes(x=SEX)) + geom_bar()
+
+```
+
+
+# Cleaning "MARITAL" 
+
+most people in the dataset are married, then never married, then divorced. There were slightly more null values than people divorced  
+
+```{r} 
+happy1 = happy1 %>% mutate(MARITAL = replace(MARITAL, MARITAL == "IAP", NA))
+happy1 = happy1 %>% mutate(MARITAL = replace(MARITAL, MARITAL == "DK", NA))
+
+happy1$MARITAL = factor(happy1$MARITAL, levels=c("NEVER MARRIED", "MARRIED", "DIVORCED"))
+
+ggplot(happy1, aes(x=MARITAL)) + geom_bar()
+
+
+```
+
+
+# Cleaning "DEGREE" 
+most people in the dataset only have high school degrees, then less than high school, bachelor, graduate, and junior college. Only a few null values  
+
+```{r} 
+happy1 = happy1 %>% mutate(DEGREE = replace(DEGREE, DEGREE == "IAP", NA))
+happy1 = happy1 %>% mutate(DEGREE = replace(DEGREE, DEGREE == "DK", NA))
+
+happy1$DEGREE = factor(happy1$DEGREE, levels=c("LT HIGH SCHOOL", "HIGH SCHOOL", "JUNIOR COLLEGE", "BACHELOR", "GRADUATE"))
+
+ggplot(happy1, aes(x=DEGREE)) + geom_bar()
+
+
+```
+
+
+# Cleaning "FINRELA" 
+
+most people in the dataset had average family income, then below average and above average. almost as many null values as above average 
+
+```{r} 
+happy1 = happy1 %>% mutate(FINRELA = replace(FINRELA, FINRELA == "IAP", NA))
+happy1 = happy1 %>% mutate(FINRELA = replace(FINRELA, FINRELA == "DK", NA))
+
+happy1$FINRELA = factor(happy1$FINRELA, levels=c("BELOW AVERAGE", "AVERAGE", "ABOVE AVERAGE"))
+
+ggplot(happy1, aes(x=FINRELA)) + geom_bar()
 
 
 
+```
+
+
+# Cleaning "HEALTH" 
+
+"GOOD" has the highest count, then excellent, fair, and poor. Lots of null values 
+
+```{r} 
+happy1 = happy1 %>% mutate(HEALTH = replace(HEALTH, HEALTH == "IAP", NA))
+happy1 = happy1 %>% mutate(HEALTH = replace(HEALTH, HEALTH == "DK", NA))
+View(happy1)
+
+happy1$HEALTH = factor(happy1$HEALTH, levels=c("POOR", "FAIR", "GOOD", "EXCELLENT"))
+
+ggplot(happy1, aes(x=HEALTH)) + geom_bar()
+
+
+```
+
+
+# Cleaning "WTSSALL" 
+
+a majority of the weight values are between 0 and 2.5 with some outliers above that. The largest value at 8.739876 
+
+```{r} 
+happy1 = happy1 %>% mutate(WTSSALL = replace(WTSSALL, WTSSALL == "IAP", NA))
+happy1 = happy1 %>% mutate(WTSSALL = replace(WTSSALL, WTSSALL == "DK", NA))
+
+max(happy1$WTSSALL)
+
+ggplot(happy1, aes(x=WTSSALL)) + geom_histogram(bins=20)
+
+```
+
+# Cleaning "PARTYID" 
+
+ordered by how many in each party. large number of null values. Most are not strong democrat 
+
+```{r} 
+happy1 = happy1 %>% mutate(PARTYID = replace(PARTYID, PARTYID == "IAP", NA))
+happy1 = happy1 %>% mutate(PARTYID = replace(PARTYID, PARTYID == "DK", NA))
+
+happy1$PARTYID = factor(happy1$PARTYID, levels=c("STRONG DEMOCRAT", "NOT STR DEMOCRAT", "IND,NEAR DEM", "INDEPENDENT", "IND,NEAR REP", "NOT STR REPUBLICAN", "STRONG REPUBLICAN", "OTHER PARTY"))
+ggplot(happy1, aes(x=PARTYID)) + geom_bar() + coord_flip()
+
+happy1$PARTYID = factor(happy1$PARTYID, levels=c("NOT STR DEMOCRAT", "STRONG DEMOCRAT", "NOT STR REPUBLICAN", "INDEPENDENT", "IND, NEAR DEM", "STRONG REPUBLICAN", "IND,NEAR REP",  "OTHER PARTY"))
+
+ggplot(happy1, aes(x=PARTYID)) + geom_bar() + coord_flip()
+
+
+```
+
+# Cleaning "POLVIEWS" 
+
+ordered from left wing to right wing. Almost symmetric across the board, with most people in the middle at moderate. Decent amount of null values 
+
+```{r} 
+happy1 = happy1 %>% mutate(POLVIEWS = replace(POLVIEWS, POLVIEWS == "IAP", NA))
+happy1 = happy1 %>% mutate(POLVIEWS = replace(POLVIEWS, POLVIEWS == "DK", NA))
+
+happy1$POLVIEWS = factor(happy1$POLVIEWS, levels = c("EXTREMELY LIBERAL", "LIBERAL", "SLIGHTLY LIBERAL", "MODERATE", "SLGHTLY CONSERVATIVE", "CONSERVATIVE", "EXTRMLY CONSERVATIVE"))
+
+ggplot(happy1, aes(x=POLVIEWS)) + geom_bar() + coord_flip()
+
+saveRDS(happy1, file="happy_clean.rds")
 
 ```
 
@@ -32,11 +218,39 @@ head(happy)
 
 
 ```{r} 
+head(happy1)
 
+
+```
+
+
+# Happiness vs Marital 
+
+There seems to be some correlation between martial status and happiness. Married people tend to be happier than never married people, as they have a larger percentage of very happy people and a smaller percentage of not to happy people. Divorced people are only slightly less happy than never married people, as they only have a slightly smaller percentage of very happy people and only a slightly larger percentage of not too happy people. 
+
+
+```{r} 
+library(ggmosaic)
+
+ggplot(data = happy1)  + 
+  geom_mosaic(aes(x = product(HAPPY), weight=1)) + facet_grid(~MARITAL) + coord_flip() + theme(axis.text.x = element_text(angle = 90))
 
 
 
 ```
+
+# Happiness vs Degree 
+
+There seems to be a correlation between happiness levels and degree of education. The percentage of not too happy people decreases as education degree increases. The percentage of very happy people seems to increase as the degree of education increases. This graph shows that people tend to be happier the higher degree of education they have. 
+
+```{r} 
+
+ggplot(data = happy1)  + 
+  geom_mosaic(aes(x = product(HAPPY), weight=1)) + facet_grid(~DEGREE) + coord_flip() + theme(axis.text.x = element_text(angle = 90))
+
+
+```
+
 
 
 
